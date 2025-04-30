@@ -1,4 +1,5 @@
 # Downloading sample fastq files 
+prefetch ERR5743893
 fastq-dump --split-files ERR5743893
 fastqc ERR5743893_1.fastq ERR5743893_2.fastq
 fastp -i ERR5743893_1.fastq -o trim.ERR5743893_1.fastq -I ERR5743893_2.fastq -O trim.ERR5743893_2.fastq -q 30
