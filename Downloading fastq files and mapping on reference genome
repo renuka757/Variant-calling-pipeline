@@ -1,0 +1,25 @@
+# Downloading sample fastq files 
+fastq-dump --split-files ERR5743893
+fastqc ERR5743893_1.fastq ERR5743893_2.fastq
+fastp -i ERR5743893_1.fastq -o trim.ERR5743893_1.fastq -I ERR5743893_2.fastq -O trim.ERR5743893_2.fastq -q 30
+
+# Mapping with reference genome 
+Reference genome used for mycobacterium tuberculosis = H37Rv reference genome version NC_000962.3
+##Indexing reference.fasta 
+bwa index reference.fasta
+bwa mem trim.ERR5743893_1.fastq trim.ERR5743893_2.fastq > output.sam
+
+# Converting sam to bam file 
+samtools view -@ 4 -S -b output.sam > output.bam
+samtools sort -o sorted.bam output.bam
+Options 
+1.Using picard
+2.Using samtools
+#Removing duplicates
+picard MarkDuplicates I=output.bam O=dedup.bam M=metrics.txt REMOVE_DUPLICATES=true
+
+samtools sort -n sorted.bam -o sorted_by_queryname.bam
+samtools fixmate -m sorted_by_queryname.bam fixed.bam
+samtools sort fixmate.bam -o fixmate_sorted.bam
+samtools markdup -r fixmate_sorted.bam dedup.bam
+
