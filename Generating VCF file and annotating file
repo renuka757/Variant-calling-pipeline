@@ -1,0 +1,39 @@
+# Using freebayes to generate VCF file
+freebayes -f ref.fasta dedup.bam > out.vcf 
+
+
+# Filtering VCF file using bcftools
+bcftools filter -i "QUAL>30 && INFO/DP>20 && INFO/AF> 0.40 && INFO/SAP>=0.50" out.vcf >filtered.vcf
+
+# Annotation of VCF file using snpEff
+SnpEff isn’t installed like a typical Linux package (apt install). You usually just download and unzip it, so it only exists in that folder.
+If you want to run snpEff from anywhere, you must:
+Add its path to your system’s $PATH environment variable
+Move the .jar file and config where your system expects
+or run command from same folder path 
+/home/linux/slokavia/snpEff
+Building custom genome 
+If you want to check if your ref genome is avalilable 
+
+nano snpEff.config
+
+If its not there edit genome in exisying file
+
+nano snpEff.config 
+Register yor genome 
+
+H37Rv.genome : Mycobacterium 
+To use a .gbk (GenBank) file with SnpEff, you must place it in a specific folder that matches the genome ID defined in snpEff.config.
+I have made a folder names in folder H37Rv in which i have stored genebank file
+Building genome using gbk file
+~/slokavia/snpEff/data/H37Rv/genes.gbk
+java -jar snpEff.jar H37Rv filtered.vcf > annotated.vcf
+
+# Compressing and indexing VCF file
+bgzip annoted.vcf
+tabidx -p vcf annoted.vcf.gz
+
+#tb profiler
+tb-profiler vcf_profile -v 2 --txt annoted.vcf.gz
+
+
